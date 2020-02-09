@@ -1,0 +1,215 @@
+/* Imports
+============================================ */
+
+@import 'normalize';
+@import 'mixins';
+@import 'helpers';
+@import 'icomoon';
+
+/* Variables
+============================================ */
+
+$primary: #9147ff;
+$border: #ccc;
+$text: #333;
+$highlight: #fbe9a3;
+
+/* Basics
+============================================ */
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  background-color: #f4f6f8;
+  overflow-x: hidden;
+}
+
+body {
+  @include flexbox();
+  @include flex-direction(column);
+  color: $text;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+a,a:visited {
+  color: $text;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus {
+    background-color: $highlight;
+  }
+}
+
+.container {
+  width: 95%;
+  max-width: 500px;
+  margin: 0px auto;
+}
+
+/* Drag & Drop
+============================================ */
+
+.drag-area {
+  @include flexbox();
+  @include justify-content(center);
+  @include align-items(center);
+  @include flex-direction(column);
+  margin-top: 3rem;
+  width: 100%;
+  border: .2rem $primary dashed;
+  height: 15rem;
+  background-color: white;
+  transition: border-color 0.3s ease-in-out;
+
+  &:hover {
+    border-color: lighten($primary, 20%);
+  }
+
+  &.disabled {
+    .disabled-state {
+      @include flexbox();
+      @include justify-content(center);
+      @include align-items(center);
+      @include flex-direction(column);
+    }
+
+    .enabled-state {
+      display: none;
+    }
+  }
+
+  .disabled-state {
+    display: none;
+
+    .uploading {
+      height: 2rem;
+      width: 2rem;
+    }
+  }
+
+  .enabled-state {
+    @include flexbox();
+    @include justify-content(center);
+    @include align-items(center);
+    @include flex-direction(column);
+  }
+
+  .feather {
+    color: $primary;
+    height: 3rem;
+    width: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  label {
+    color: $primary;
+    font-weight: 700;
+  }
+
+  input {
+    position: absolute;
+    top: -50rem;
+    opacity: 0;
+  }
+}
+
+.results {
+  @include flexbox();
+  @include justify-content(center);
+  @include align-items(center);
+  margin: 1rem 0;
+
+  .result-wrap {
+    @include flexbox();
+    @include justify-content(center);
+    @include align-items(center);
+    @include flex-direction(column);
+
+    p {
+      margin-top: 0.25rem;
+    }
+  }
+
+  .result {
+    background-image: url('../assets/transparency-bg.jpg');
+    border: 1px solid $border;
+    border-radius: 0.25rem;
+    margin: 0 0.5rem;
+  }
+
+  canvas {
+    display: block;
+  }
+}
+
+/* Loading
+============================================ */
+
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 33px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: $primary;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+
+
+
+/* FOUC
+============================================ */
+
+html {
+  opacity: 1;
+  visibility: visible;
+}
