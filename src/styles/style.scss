@@ -34,12 +34,26 @@ body {
 }
 
 a,a:visited {
-  color: $text;
-  text-decoration: underline;
+  color: $primary;
+  font-weight: 700;
+  text-decoration: none;
 
   &:hover,
   &:focus {
     background-color: $highlight;
+  }
+}
+
+.btn {
+  border: 0;
+  background-color: $primary;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease-in-out;
+
+  &:hover {
+    background-color: darken($primary, 20%);
   }
 }
 
@@ -49,7 +63,43 @@ a,a:visited {
   margin: 0px auto;
 }
 
-/* Drag & Drop
+/* Header.vue
+============================================ */
+
+header {
+  @include flexbox();
+  @include align-items(center);
+  @include justify-content(space-between);
+  background-color: white;
+  width: 100%;
+  padding: 1rem;
+
+  .header-wrap {
+    @include flexbox();
+    @include align-items(center);
+    @include justify-content(space-between);
+  }
+
+  .logo-wrap {
+    @include flexbox();
+    @include align-items(center);
+    width: 50%;
+  }
+
+  .logo {
+    max-width: 25px;
+    height: auto;
+  }
+
+  h1 {
+    display: inline-block;
+    margin-left: 0.5rem;
+    line-height: 0;
+  }
+}
+
+
+/* DropForm.vue
 ============================================ */
 
 .drag-area {
@@ -59,7 +109,7 @@ a,a:visited {
   @include flex-direction(column);
   margin-top: 3rem;
   width: 100%;
-  border: .2rem $primary dashed;
+  border: 1px $primary solid;
   height: 15rem;
   background-color: white;
   transition: border-color 0.3s ease-in-out;
@@ -143,6 +193,11 @@ a,a:visited {
   canvas {
     display: block;
   }
+}
+
+.download {
+  @include flexbox();
+  @include justify-content(center);
 }
 
 /* Loading

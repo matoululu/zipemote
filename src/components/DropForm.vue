@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-  <form v-on:drop="handleDrop" class="drag-area">
+  <form v-on:drop="handleDrop" v-bind:class="{active: isActive}" class="drag-area shadow">
     <div class="disabled-state">
       <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
     </div>
@@ -11,9 +11,9 @@
     </div>
   </form>
 
-  <div class="results">
+  <div class="results"></div>
+  <div class="download"></div>
 
-  </div>
 </div>
 </template>
 
@@ -32,25 +32,37 @@ export default {
   components: {
     UploadIcon
   },
+  data() {
+    return {
+      isActive: false
+    }
+  },
   methods: {
     handleDrop: function(e) {
-      const dt = e.dataTransfer
-      const files = dt.files
-      this.handleFiles(files)
+      //Check if file handling is in process
+      if(this.isActive === false) {
+        //Toggle active class
+        this.isActive = !this.isActive;
+        const files = e.dataTransfer.files
 
-      DOM.dragForm.removeEventListener('drop', this.handleDrop, false);
-      DOM.dragForm.classList.add('disabled');
+        zip.remove();
+        DOM.results.innerHTML = '';
+        DOM.download.innerHTML = '';
+        DOM.dragForm.classList.add('disabled');
+
+        this.handleFiles(files);
+      }
     },
     handleFiles: function(files) {
       ([...files]).forEach(this.uploadFile)
     },
     uploadFile: function(file) {
+      const $this = this;
       const emoteSizes = [28,56,112];
       let modifiedImages = [];
       let imagesProcessed = 0;
 
-      const ev = this;
-
+      //Resize image
       emoteSizes.forEach(function(size, index, array) {
         ImageTools.resize(file, {
           width: size,
@@ -62,55 +74,75 @@ export default {
           if(imagesProcessed === array.length) {
             //Sort images biggest to smallest
             const sorted = modifiedImages.sort(function(a,b) {return parseFloat(a.size) - parseFloat(b.size);})
-            ev.displayEmotes(sorted.reverse());
+            $this.displayEmotes(sorted.reverse());
           }
         })
       })
     },
     displayEmotes: function(modifiedImages, size) {
-      const ev = this;
+      const $this = this;
       let imagesProcessed = 0;
       modifiedImages.forEach(function(imageBlob, index, array){
+        //Create DOM elements
         const parent = document.createElement('div');
         const imageWrap = document.createElement('div');
         const size = document.createElement('p');
         const canvas = document.createElement('canvas');
+        const btn = document.createElement('button');
         const context = canvas.getContext('2d');
         const baseImage = new Image();
 
-        parent.classList.add('result-wrap');
-        imageWrap.classList.add('result');
-
+        //Set image source to blob URL
         baseImage.src = window.URL.createObjectURL(imageBlob);
+
         baseImage.onload = function(){
+          //Set canvas size
           canvas.height = baseImage.height;
           canvas.width = baseImage.width;
-          size.textContent = `${baseImage.width}px`;
+
+          //Draw canvas
           context.drawImage(baseImage, 0,0, canvas.width, canvas.height);
 
-          let blobToPng = ev.convertToPng(canvas)
-          blobToPng.name = `${baseImage.width}`;
+          //Conver to PNG
+          const blobToPng = $this.convertToPng(canvas)
 
-          const fileName = `${blobToPng.name}.png`;
-          zip.file(fileName, imageBlob);
+          //Set file name and bottom text to image width
+          blobToPng.name = `${baseImage.width}.png`;
+          size.textContent = `${baseImage.width} x ${baseImage.height}`;
+
+          //Add image to zip (Image name, Image data)
+          zip.file(blobToPng.name, imageBlob);
+
+          //Increase image processed, if 3 generate zip
           imagesProcessed++;
           if(imagesProcessed === array.length) {
             zip.generateAsync({type:"blob"})
             .then(function(content) {
-              saveAs(content, Date.now());
+
+              $this.isActive = !$this.isActive;
+
+              btn.classList.add('btn');
+              btn.textContent = 'Download .zip';
+              DOM.download.appendChild(btn);
+              btn.removeEventListener('click', function(){});
+              btn.addEventListener('click', function(){
+                saveAs(content, `${Date.now()}.zip`);
+              })
             });
+
+            //Reenable form
+            DOM.dragForm.classList.remove('disabled');
           }
         }
 
+        //Apply classes and append to DOM
+        parent.classList.add('result-wrap');
+        imageWrap.classList.add('result', 'shadow');
         imageWrap.appendChild(canvas);
         parent.appendChild(imageWrap);
         parent.appendChild(size);
         DOM.results.appendChild(parent);
       })
-
-
-
-      DOM.dragForm.classList.remove('disabled');
     },
     convertToPng: function(canvas) {
       const image = new Image();
@@ -122,23 +154,19 @@ export default {
     DOM = {
       dragForm: document.querySelector('.drag-area'),
       dragInput: document.querySelector('input[type="file"]'),
-      results: document.querySelector('.results')
+      results: document.querySelector('.results'),
+      download: document.querySelector('.download')
     }
+
+    const events = ['dragenter', 'dragover', 'dragleave', 'drop'];
 
     //Prevent defaults
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      DOM.dragForm.addEventListener(eventName, preventDefaults, false);
+    events.forEach(event => {
+      DOM.dragForm.addEventListener(event, function(e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }, false);
     })
-
-    function preventDefaults(e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-</style>
