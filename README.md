@@ -1,4 +1,4 @@
-# uploader
+# Emotely
 
 ## Project setup
 ```
