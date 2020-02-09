@@ -121,7 +121,7 @@ export default {
 
               $this.isActive = !$this.isActive;
 
-              btn.classList.add('btn');
+              btn.classList.add('btn', 'shadow');
               btn.textContent = 'Download .zip';
               DOM.download.appendChild(btn);
               btn.removeEventListener('click', function(){});
