@@ -6,8 +6,8 @@
     </div>
     <div class="enabled-state">
       <upload-icon size="1.5x" class="custom-class"></upload-icon>
-      <label for="uploader">Drop your .png or .jpg file here!</label>
-      <input type="file" accept="image/*" name="uploaded">
+      <label for="uploader">Drop your .png or .jpg file or click here!</label>
+      <input id="uploader" v-on:change.prevent="handleDrop" v-bind:class="{active: isActive}" type="file" accept="image/*" name="uploader">
     </div>
   </form>
 
@@ -30,7 +30,8 @@ let DOM;
 export default {
   name: 'DropForm',
   components: {
-    UploadIcon
+    UploadIcon,
+    dragInput: document.querySelector('#uploader')
   },
   data() {
     return {
@@ -39,19 +40,25 @@ export default {
   },
   methods: {
     handleDrop: function(e) {
+      let files;
       //Check if file handling is in process
       if(this.isActive === false) {
-        //Toggle active class
-        this.isActive = !this.isActive;
-        const files = e.dataTransfer.files
-
-        zip.remove();
-        DOM.results.innerHTML = '';
-        DOM.download.innerHTML = '';
-        DOM.dragForm.classList.add('disabled');
-
-        this.handleFiles(files);
+        if(e.type === 'change') {
+          files = e.target.files
+        } else {
+          files = e.dataTransfer.files;
+        }
       }
+
+      //Toggle active class
+      this.isActive = !this.isActive;
+
+      zip.remove();
+      DOM.results.innerHTML = '';
+      DOM.download.innerHTML = '';
+      DOM.dragForm.classList.add('disabled');
+
+      this.handleFiles(files);
     },
     handleFiles: function(files) {
       ([...files]).forEach(this.uploadFile)

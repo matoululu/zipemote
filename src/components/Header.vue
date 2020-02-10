@@ -11,7 +11,7 @@
             </g>
           </g>
         </svg>
-        <h1>Emotly</h1>
+        <h1>ZipEmote</h1>
       </div>
       <nav role="navigation">
         <a href="https://www.buymeacoffee.com/matouio" target="_blank">Donate</a>

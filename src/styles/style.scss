@@ -37,10 +37,11 @@ a,a:visited {
   color: $primary;
   font-weight: 700;
   text-decoration: none;
+  transition: color 0.3s ease-in-out;
 
   &:hover,
   &:focus {
-    background-color: $highlight;
+    color: darken($primary, 20%);
   }
 }
 
@@ -156,6 +157,7 @@ header {
 
   label {
     color: $primary;
+    cursor: pointer;
     font-weight: 700;
   }
 
